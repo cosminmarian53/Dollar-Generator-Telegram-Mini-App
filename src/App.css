@@ -1,17 +1,17 @@
-.dollar-generator-button{
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-    cursor: pointer;
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-    font-weight: bold;
-    font-family: 'Roboto', sans-serif;
-    transition: 0.3s;
+.dollar-generator-button {
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-family: "Roboto", sans-serif;
+  transition: 0.3s;
 }
 :root {
   --backgroundColor: rgba(246, 241, 209);
@@ -22,14 +22,44 @@
   --colorShadeE: rgb(205, 255, 232);
 }
 /* TOP SIDE */
-.top-side{
+.top-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  /* box shadow with a small shade of green */
+  box-shadow: 0 0 5px 0 var(--colorShadeA), 0 0 10px 0 var(--colorShadeB), 0 0 15px 0 var(--colorShadeC), 0 0 20px 0 var(--colorShadeD);
+}
+.application-logo{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    box-shadow: 0 0 5px 0 var(--colorShadeA), 0 0 10px 0 var(--colorShadeB), 0 0 15px 0 var(--colorShadeC), 0 0 20px 0 var(--colorShadeD);
+}
+/* Dollar Generator App Content*/
+.app-content{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: 5px;
-    /* box shadow with a small shade of green */
-    box-shadow: 0 0 20px 0 rgba(28, 255, 93, 0.6);
+    padding: 20px;
+    border-radius: 5px;  
+}
+.progress-gradient {
+  background: linear-gradient(to right,#282828, #90ff9d, #33ff24);
+}
+@keyframes float {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
 }
 /* Buttons */
 button {
