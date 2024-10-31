@@ -64,7 +64,7 @@ const Upgrade = ({
           </div>
           <div className="flex justify-center w-full">
             <button
-              className="bg-[#f1c40f] text-black px-4 py-2 rounded-lg"
+              className=" big-upgrade-button rounded-lg"
               onClick={upgrade}
             >
               Upgrade for {formatUpgradeCost(upgradeCost)}💲
