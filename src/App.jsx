@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import appLogo from "./assets/app_logo.jpg";
-import dollarSignLogo from "./assets/dollar_logo.png";
-import cashingSound from "./assets/cashing-sound.mp3";
+import Header from "./components/Header";
+import Upgrade from "./components/Upgrade";
+import Footer from "./components/Footer";
 import "./App.css";
 
 import WebApp from "@twa-dev/sdk";
+import Home from "./components/Home";
 const levelNames = [
   "☠️Beggar", // From 0 to 4999 coins
   "😐Peasant", // From 5000 coins to 24,999 coins
@@ -28,13 +29,22 @@ function App() {
   const [dollars, setDollars] = useState(0);
   const [levelIndex, setLevelIndex] = useState(6);
   const [clicks, setClicks] = useState([]);
-  const pointsToAdd = 15;
-  const profitPerHour = 12530;
+  const [currentComponent, setCurrentComponent] = useState("home");
+  const [profitPerClick, setProfitPerClick] = useState(6);
+  const [profitPerHour, setProfitPerHour] = useState(100);
+  const [upgradeCost, setUpgradeCost] = useState(100);
+
+  const handleHomeClick = () => {
+    setCurrentComponent("home");
+  };
+
+  const handleUpgradeClick = () => {
+    setCurrentComponent("upgrade");
+  };
 
   const [dailyRewardTimeLeft, setDailyRewardTimeLeft] = useState("");
   const [dailyCipherTimeLeft, setDailyCipherTimeLeft] = useState("");
   const [dailyComboTimeLeft, setDailyComboTimeLeft] = useState("");
-  const cashing = new Audio(cashingSound);
   const calculateTimeLeft = (targetHour) => {
     const now = new Date();
     const target = new Date(now);
@@ -79,8 +89,11 @@ function App() {
       card.style.transform = "";
     }, 100);
 
-    setDollars((prevDollars) => prevDollars + pointsToAdd);
-    setClicks([...clicks, { id: Date.now(), x: e.pageX, y: e.pageY }]);
+    setDollars((prevDollars) => prevDollars + profitPerClick);
+    setClicks((prevClicks) => [
+      ...prevClicks,
+      { id: Date.now(), x: e.pageX, y: e.pageY },
+    ]);
   };
 
   const handleAnimationEnd = (id) => {
@@ -109,6 +122,12 @@ function App() {
   }, [dollars, levelIndex]);
 
   const formatProfitPerHour = (profit) => {
+    if (profit >= 1000000000000000000)
+      return `+${profit / 1000000000000000000}E`;
+    if (profit >= 1000000000000000)
+      return `+${(profit / 1000000000000000).toFixed(2)}Q`;
+    if (profit >= 1000000000000)
+      return `+${(profit / 1000000000000).toFixed(2)}T`;
     if (profit >= 1000000000) return `+${(profit / 1000000000).toFixed(2)}B`;
     if (profit >= 1000000) return `+${(profit / 1000000).toFixed(2)}M`;
     if (profit >= 1000) return `+${(profit / 1000).toFixed(2)}K`;
@@ -116,7 +135,9 @@ function App() {
   };
 
   useEffect(() => {
-    const pointsPerSecond = Math.floor(profitPerHour / 3600);
+    const pointsPerSecond = Math.floor(
+      profitPerHour / 3600 + profitPerClick / 2
+    );
     const interval = setInterval(() => {
       setDollars((prevDollars) => prevDollars + pointsPerSecond);
     }, 1000);
@@ -124,7 +145,7 @@ function App() {
   }, [profitPerHour]);
 
   useEffect(() => {
-    const loadDollarsStorage = () => {
+    const loadStorage = () => {
       WebApp.CloudStorage.getItem("dollars", (error, data) => {
         if (error) {
           console.error("Error loading dollars", error);
@@ -132,109 +153,133 @@ function App() {
           setDollars(parseInt(data, 10)); // Ensure the data is parsed as an integer
         }
       });
+
+      WebApp.CloudStorage.getItem("profitPerClick", (error, data) => {
+        if (error) {
+          console.error("Error loading profitPerClick", error);
+        } else if (data) {
+          setProfitPerClick(parseInt(data, 10)); // Ensure the data is parsed as an integer
+        }
+      });
+
+      WebApp.CloudStorage.getItem("profitPerHour", (error, data) => {
+        if (error) {
+          console.error("Error loading profitPerHour", error);
+        } else if (data) {
+          setProfitPerHour(parseInt(data, 10)); // Ensure the data is parsed as an integer
+        }
+      });
+
+      WebApp.CloudStorage.getItem("upgradeCost", (error, data) => {
+        if (error) {
+          console.error("Error loading upgradeCost", error);
+        } else if (data) {
+          setUpgradeCost(parseInt(data, 10)); // Ensure the data is parsed as an integer
+        }
+      });
     };
 
-    loadDollarsStorage();
+    loadStorage();
   }, []);
 
   // Save dollars to storage whenever the dollars state changes
   useEffect(() => {
-    const saveDollarsStorage = () => {
-      WebApp.CloudStorage.setItem(
-        "dollars",
-        dollars.toString(),
-        (error, success) => {
-          if (error) {
-            console.error("Error saving dollars", error);
-          } else if (success) {
-            console.log("Dollars saved successfully!");
-          }
+    WebApp.CloudStorage.setItem(
+      "dollars",
+      dollars.toString(),
+      (error, success) => {
+        if (error) {
+          console.error("Error saving dollars", error);
+        } else if (success) {
+          console.log("Dollars saved successfully!");
         }
-      );
-    };
-
-    saveDollarsStorage();
+      }
+    );
   }, [dollars]);
+
+  // Save profitPerClick to storage whenever the profitPerClick state changes
+  useEffect(() => {
+    WebApp.CloudStorage.setItem(
+      "profitPerClick",
+      profitPerClick.toString(),
+      (error, success) => {
+        if (error) {
+          console.error("Error saving profitPerClick", error);
+        } else if (success) {
+          console.log("Profit per click saved successfully!");
+        }
+      }
+    );
+  }, [profitPerClick]);
+
+  // Save profitPerHour to storage whenever the profitPerHour state changes
+  useEffect(() => {
+    WebApp.CloudStorage.setItem(
+      "profitPerHour",
+      profitPerHour.toString(),
+      (error, success) => {
+        if (error) {
+          console.error("Error saving profitPerHour", error);
+        } else if (success) {
+          console.log("Profit per hour saved successfully!");
+        }
+      }
+    );
+  }, [profitPerHour]);
+
+  // Save upgradeCost to storage whenever the upgradeCost state changes
+  useEffect(() => {
+    WebApp.CloudStorage.setItem(
+      "upgradeCost",
+      upgradeCost.toString(),
+      (error, success) => {
+        if (error) {
+          console.error("Error saving upgradeCost", error);
+        } else if (success) {
+          console.log("Upgrade cost saved successfully!");
+        }
+      }
+    );
+  }, [upgradeCost]);
 
   return (
     <>
       <div className="container z-0 flex items-center justify-center flex-col w-100 h-100">
-        <div className="bg-[#171717] top-side flex items-center w-[100%] h-100 border-2">
-          <div className="container mx-auto p-4">
-            <nav className="flex justify-between items-center">
-              <div className="flex justify-between items-center">
-                <div className="ml-4">
-                  <h2 className="text-white text-lg font-bold mr-4">
-                    @{username}
-                  </h2>
-                </div>
-
-                <div className="flex justify-between">
-                  <p className="text-sm text-white">{levelNames[levelIndex]}</p>
-                </div>
-                <div className="flex ml-8">
-                  <h2 className="text-white text-lg font-bold">
-                    {formatProfitPerHour(dollars)}💲
-                  </h2>
-                </div>
-              </div>
-            </nav>
-          </div>
-        </div>
-        <div className="container mx-auto p-4 app-content">
-          <header className="text-center my-4">
-            <img
-              src={appLogo}
-              className="mx-auto h-16 application-logo"
-              alt="Application logo"
-            />
-            <h1 className="text-white text-2xl font-bold">
-              🤑Welcome to Dollar Generator, {first_name}!
-            </h1>
-            <p className="text-white text-lg">
-              Click the button below to generate as many dollars as you can!💵
-            </p>
-            <div className="flex items-center mt-1 border-2 border-[#43433b] rounded-full">
-              <div className="w-full h-2 bg-[#43433b]/[0.6] rounded-full">
-                <div
-                  className="progress-gradient h-2 rounded-full"
-                  style={{ width: `${calculateProgress()}%` }}
-                ></div>
-              </div>
-            </div>
-          </header>
-          <main className="text-center">
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded big-button"
-              onClick={handleCardClick}
-            >
-              <img
-                src={dollarSignLogo}
-                className="h-[35px] w-[35px]"
-                alt="Dollar sign"
-                onClick={() => {
-                  cashing.play();
-                  cashing.volume = 0.3;
-                }}
-              />
-            </button>
-            {clicks.map((click) => (
-              <div
-                key={click.id}
-                className="absolute text-5xl font-bold opacity-0 text-white pointer-events-none"
-                style={{
-                  top: `${click.y - 40}px`,
-                  left: `${click.x - 28}px`,
-                  animation: `float 1s ease-in-out`,
-                }}
-                onAnimationEnd={() => handleAnimationEnd(click.id)}
-              >
-                +{pointsToAdd}💲
-              </div>
-            ))}
-          </main>
-          <footer className="text-center mt-4"></footer>
-        </div>
+        <Header
+          username={username}
+          dollars={dollars}
+          levelNames={levelNames}
+          levelIndex={levelIndex}
+          formatProfitPerHour={formatProfitPerHour}
+        />
+        {currentComponent === "home" ? (
+          <Home
+            first_name={first_name}
+            clicks={clicks}
+            profitPerClick={profitPerClick}
+            handleCardClick={handleCardClick}
+            handleAnimationEnd={handleAnimationEnd}
+            calculateProgress={calculateProgress}
+          />
+        ) : (
+          <Upgrade
+            levelNames={levelNames}
+            levelIndex={levelIndex}
+            dollars={dollars}
+            setDollars={setDollars}
+            profitPerClick={profitPerClick}
+            setProfitPerClick={setProfitPerClick}
+            setProfitPerHour={setProfitPerHour}
+            setUpgradeCost={setUpgradeCost}
+            upgradeCost={upgradeCost}
+            profitPerHour={profitPerHour}
+            formatProfitPerHour={formatProfitPerHour}
+          />
+        )}
+        <Footer
+          handleHomeClick={handleHomeClick}
+          handleUpgradeClick={handleUpgradeClick}
+        />
       </div>
     </>
   );
