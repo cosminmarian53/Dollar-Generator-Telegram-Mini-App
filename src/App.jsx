@@ -274,6 +274,7 @@ function App() {
             upgradeCost={upgradeCost}
             profitPerHour={profitPerHour}
             formatProfitPerHour={formatProfitPerHour}
+            levelMinPoints={levelMinPoints}
           />
         )}
         <Footer

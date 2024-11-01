@@ -13,6 +13,7 @@ const Upgrade = ({
   upgradeCost,
   profitPerHour,
   formatProfitPerHour,
+  levelMinPoints,
 }) => {
   const upgrade = () => {
     if (dollars >= upgradeCost) {
@@ -50,6 +51,10 @@ const Upgrade = ({
             <p className="text-sm text-white">
               <br />
               <span>Next level:</span> {levelNames[levelIndex + 1]}
+            </p>
+            <p className="text-sm text-white">
+              Dollars needed to reach next level:{" "}
+              {levelMinPoints[levelIndex + 1] - dollars}💲
             </p>
           </div>
           <div className="flex flex-col items-center w-full">
